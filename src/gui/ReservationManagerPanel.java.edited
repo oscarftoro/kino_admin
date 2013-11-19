@@ -1,0 +1,231 @@
+package gui;
+
+import controller.ReservationController;
+import guiDataTest.TableData;
+
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JLabel;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.AbstractAction;
+import javax.swing.ListSelectionModel;
+
+import java.awt.event.ActionEvent;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Vector;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+public class ReservationManagerPanel extends JPanel {
+	private JTable table;
+	private JTextField textField;
+	private JButton btnNewReservation;
+	private final Action newReservationAction = new NewReservation();
+	private JPanel formsPanel;
+	private StartKinoPanel startKinoPanel;
+	private JPanel headerPanel;
+	private JPanel newReservationPanel;
+	private JPanel reservationListPanel;
+	private JPanel mainContainer;
+	private JPanel wrapperPanel;
+	private JPanel extraServicesWrapperPanel;
+	private JPanel reservationsInfoPanel;
+
+	/**
+	 * Create the panel.
+	 * @param startKinoPanel 
+	 */
+	public ReservationManagerPanel(StartKinoPanel startKinoPanel) {
+		this.startKinoPanel = startKinoPanel;
+		
+		setLayout(new BorderLayout(0, 0));
+		
+		mainContainer = new JPanel();
+		add(mainContainer, BorderLayout.CENTER);
+		mainContainer.setLayout(new BorderLayout(0, 0));
+		
+		wrapperPanel = new JPanel();
+		mainContainer.add(wrapperPanel);
+		wrapperPanel.setLayout(new BorderLayout(5, 0));
+		
+		reservationListPanel = new JPanel();
+		wrapperPanel.add(reservationListPanel, BorderLayout.WEST);
+		reservationListPanel.setLayout(new BorderLayout(0, 10));
+		
+		JPanel searchPanel = new JPanel();
+		reservationListPanel.add(searchPanel, BorderLayout.NORTH);
+		searchPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel = new JPanel();
+		searchPanel.add(panel, BorderLayout.WEST);
+		panel.setLayout(new BorderLayout(5, 0));
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Name", "Surname", "Phone", "Email", "Movie"}));
+		panel.add(comboBox, BorderLayout.CENTER);
+		
+		JPanel panel_1 = new JPanel();
+		searchPanel.add(panel_1, BorderLayout.CENTER);
+		panel_1.setLayout(new BorderLayout(0, 0));
+		
+		textField = new JTextField();
+		panel_1.add(textField, BorderLayout.CENTER);
+		textField.setColumns(10);
+		
+		JButton btnSearch = new JButton("");
+		btnSearch.setIcon(new ImageIcon(ReservationManagerPanel.class.getResource("/images/49.png")));
+		panel_1.add(btnSearch, BorderLayout.EAST);
+		
+		JPanel tablePanel = new JPanel();
+		reservationListPanel.add(tablePanel, BorderLayout.CENTER);
+		tablePanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel labelPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) labelPanel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		tablePanel.add(labelPanel, BorderLayout.NORTH);
+		
+		JLabel lblReservations = new JLabel("Reservations");
+		lblReservations.setFont(new Font("Tahoma", Font.BOLD, 14));
+		labelPanel.add(lblReservations);
+		
+		JPanel centerPanel = new JPanel();
+		tablePanel.add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout(0, 0));
+		
+		table = new JTable();
+		centerPanel.add(table);
+		/*
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+				{null, null, null, null, null, null, null},
+				{null, "www", "www", null, null, null, null},
+				{null, null, null, null, null, null, null},
+				{null, null, null, null, null, null, null},
+			},
+			new String[] {
+				"Date", "Session", "Movie", "Name", "Surname", "Phone", "Email"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, true, true, true, true, true, true
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		centerPanel.add(table.getTableHeader(), BorderLayout.NORTH);
+		*/
+		table.setModel(getMovieList());
+		centerPanel.add(table.getTableHeader(), BorderLayout.NORTH);
+		
+		newReservationPanel = new JPanel();
+		reservationListPanel.add(newReservationPanel, BorderLayout.SOUTH);
+		
+		btnNewReservation = new JButton("New Reservation");
+		btnNewReservation.setAction(newReservationAction);
+		newReservationPanel.add(btnNewReservation);
+		
+		headerPanel = new JPanel();
+		wrapperPanel.add(headerPanel, BorderLayout.NORTH);
+		headerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		
+		JLabel lblTitle = new JLabel("Reservation Manager");
+		lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+		headerPanel.add(lblTitle);
+		
+		formsPanel = new JPanel();
+		wrapperPanel.add(formsPanel, BorderLayout.CENTER);
+		formsPanel.setLayout(new BorderLayout(0, 0));
+		
+		reservationsInfoPanel = new JPanel();
+		formsPanel.add(reservationsInfoPanel, BorderLayout.NORTH);
+		
+		reservationsInfoPanel.setLayout(new BorderLayout(0, 0));
+		reservationsInfoPanel.add(startKinoPanel.getReservationInfoPanel(), BorderLayout.NORTH);
+		
+		
+		extraServicesWrapperPanel = new JPanel();
+		formsPanel.add(extraServicesWrapperPanel, BorderLayout.CENTER);
+		
+		extraServicesWrapperPanel.setLayout(new BorderLayout(0, 0));
+		extraServicesWrapperPanel.add(startKinoPanel.getServicesPanel(), BorderLayout.CENTER);
+
+		//set table columns width
+		int[] columnsWidth = { 30, 80, 60, 100 };//columns size
+		TableFormat.formatTable(columnsWidth, table);//format table look
+	}
+
+
+	
+	//***************test method to populate the movies table---> to be replaced with a controller call****************
+<<<<<<< .mine
+	private static DefaultTableModel getMovieList() {
+		try {
+			//String q = "SELECT DISTINCT movies.id, title, year, genre FROM movies, schedule WHERE movies.id=schedule.id ORDER BY title ASC";
+			String q = "SELECT reservations.id, CustomerName, CustomerPhoneNumber, title FROM movies, reservations WHERE movies.id = reservations.movies_id ORDER BY CustomerName ASC";
+			String [] tableHeaders = {"Id", "Name", "Phone", "Movie"};
+			return TableData.buildTableModel(q, tableHeaders);//-->> TODO: connect to controller after testing
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+=======
+		private static DefaultTableModel getMovieList() {
+//			try {
+				//String q = "SELECT DISTINCT movies.id, title, year, genre FROM movies, schedule WHERE movies.id=schedule.id ORDER BY title ASC";
+				//String q = "SELECT reservations.id, CustomerName, CustomerPhoneNumber, title FROM movies, reservations WHERE movies.id = reservations.movies_id ORDER BY CustomerName ASC";
+				//String [] tableHeaders = {"Id", "Name", "Phone", "Movie"};
+                Vector<String> tableHeaders = new Vector<>(Arrays.asList(new String[]{"Id", "Name", "Phone", "Movie"}));
+                Vector<Vector<Object>> data = ReservationController.getInstance().getReservations();
+                return new DefaultTableModel(data,tableHeaders);
+				//return TableData.buildTableModel(q, tableHeaders);//-->> TODO: connect to controller after testing
+				
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//			return null;
+>>>>>>> .r72
+		}
+		return null;
+	}
+		
+	
+		
+	public JPanel getMainContainer() {
+		return mainContainer;
+	}
+	
+	public JPanel getWrapperPanel() {
+		return wrapperPanel;
+	}
+
+	public JPanel getExtraServicesWrapperPanel() {
+		return extraServicesWrapperPanel;
+	}
+
+	private class NewReservation extends AbstractAction {
+		public NewReservation() {
+			putValue(NAME, "New Reservation");
+			//putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+			mainContainer.removeAll();
+			mainContainer.add(startKinoPanel.getNewReservationPanel(), BorderLayout.CENTER);
+			startKinoPanel.getNewReservationPanel().getMainPanel().add(startKinoPanel.getSchedule(), BorderLayout.CENTER);
+			startKinoPanel.getSchedule().resetDate();
+ 			startKinoPanel.getSchedule().updateSchedule();
+			mainContainer.updateUI();
+		}
+	}
+}
